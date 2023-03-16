@@ -1,44 +1,60 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
     <title>Tutorial of Develop</title>
-    <link rel="stylesheet" th:href="@{css/user/register.css}">
+    <link rel="stylesheet" th:href="@{/css/user/register.css}">
 </head>
 <body>
     <h1>User情報管理システム</h1>
     <h2>User登録</h2>
     <form method="post" th:action="@{/user/register}" th:object="${user}">
         <label for="name">名前</label>
-        <input type="text" th:field="*{name}">
+        <input type="text" th:field="*{name}" th:errorclass="err">
+
         <!--/*th:action でformのPOST先のURLを指定*/-->
         <!--/*th:object はModelに登録されたキー名を指定*/-->
         <!--/*これにより th:field では *{name} のようにキーを省略して記述できます。th:object を使用しない場合は th:field=${user.name} と記述します*/-->
-    <br>
-    <label for="gender">性別</label>
 
-    <select th:field="*{gender}">
+        <span th:errors="*{name}" class="err"></span>
+        <br>
 
-        <option value="" th:text="選択してください">
+        <label for="gender">性別</label>
+        <select th:field="*{gender}" th:errorclass="err">
+            <option value="" th:text="選択してください" th:selected="${user.gender == ''}">
+            <option
+                th:each="item:${T(com.techacademy.entity.User.Gender).values()}"
+                th:value="${item}" th:text="${item}" th:selected="*{gender} == ${item}">
+        </select>
 
-        <option th:each="item:${T(com.techacademy.entity.User.Gender).values()}" th:value="${item}" th:text="${item}">
-    </select>
-
-    <!--/*th:each属性は属性値に入っている値を繰り返し出力する属性*/-->
+          <!--/*th:each属性は属性値に入っている値を繰り返し出力する属性*/-->
     <!--/*T(com.techacademy.entity.User.Gender)は、ThymeleafでJavaのStatic変数やStaticメソッドを呼び出す構文*/-->
     <!--/*呼び出されたGender変数は列挙型であり、valuesメソッドを使用することで定義された列挙子をすべて取得できます*/-->
     <!--/*th:value はThymeleafの属性で、<input> や <option> といったフォーム部品の value 属性とその値を出力します*/-->
-    <br>
-    <label for="age">年齢</label>
-    <input type="text" th:field="*{age}">
-    <br>
-    <label for="email">メールアドレス</label>
-    <input type="text" th:field="*{email}">
-    <br>
-    <br>
-    <input type="submit" value="登録実行">
-    <a th:href="@{/user/list}">登録せず一覧に戻る</a>
-    </form>
 
+        <span th:errors="*{gender}" class="err"></span>
+        <br>
+
+        <label for="age">年齢</label>
+        <input type="text" th:field="*{age}" th:errorclass="err">
+        <span th:errors="*{age}" class="err"></span>
+        <br>
+
+        <label for="email">メールアドレス</label>
+        <input type="text" th:field="*{email}" th:errorclass="err">
+        <span th:errors="*{email}" class="err"></span>
+        <br>
+        <br>
+
+        <input type="submit" value="登録実行">
+        <a th:href="@{/user/list}">登録せずに一覧に戻る</a>
+
+        <!--/*th:errorclass="err" はエラー時に適用するクラスを指定しています。*/-->
+        <!--/*これによりエラー時には項目値が赤く表示されます。*/-->
+
+        <!--/*<span th:errors="*{name}" class="err"></span> は入力チェックのエラーメッセージをThymeleafで表示する方法*/-->
+        <!--/*エラーがあった場合、span要素が表示されます*/-->
+
+    </form>
 </body>
 </html>
