@@ -1,11 +1,15 @@
 package com.techacademy.controller;
 
+import java.util.Set;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.techacademy.entity.User;
 import com.techacademy.service.UserService;
@@ -43,5 +47,34 @@ public class UserController {
         // 一覧画面にリダイレクト
         return "redirect:/user/list";
     }
+
+    @GetMapping("/update/{id}/")
+    public String getUser(@PathVariable("id") Integer id, Model model) {
+        //Modelに登録
+        model.addAttribute("user", service.getUser(id));
+        //User更新画面に遷移
+        return "user/update";
+    }
+
+    @PostMapping("/update/{id}/")
+    public String postUser(User user) {
+        //User登録
+        service.saveUser(user);
+        //一覧画面にリダイレクト
+        return "redirect:/user/list";
+    }
+
+    /** User削除処理 */
+    @PostMapping(path="list", params="deleteRun")
+    public String deleteRun(@RequestParam(name="idck") Set<Integer> idck, Model model) {
+        // Userを一括削除
+        service.deleteUser(idck);
+        // 一覧画面にリダイレクト
+        return "redirect:/user/list";
+    }
+    //Userを削除するためにdeleteRunメソッドが追加
+    //deleteRunメソッドの引数に@RequestParam(name="idck") Set<Integer> idckの記述があります。
+    //@RequestParamアノテーションで、リクエストパラメータからidckの配列値を取得しています。
+    //取得したidckの値をサービスに渡して、対象のUserを削除
 
 }
