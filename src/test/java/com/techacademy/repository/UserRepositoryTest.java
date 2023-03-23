@@ -27,3 +27,9 @@ class UserRepositoryTest {
     }
 
 }
+
+//@SpringBootTest アノテーションにより、Spring Bootアプリケーションの初期化が行なわれます。
+//これにより、 data.sql などが実行され、テストに必要な環境が準備されます。
+//また、テストコードで @Autowired などのSpring Bootのアノテーションを使用できるようになります。
+
+//JUnitには専用のメソッドが用意されています。assertEquals() は2つの値が等しいかどうかを判定するメソッドです

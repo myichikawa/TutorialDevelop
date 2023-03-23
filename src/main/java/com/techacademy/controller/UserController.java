@@ -41,6 +41,13 @@ public class UserController {
         return "user/register";
     }
 
+    //@ModelAttributeアノテーションを付与すると、自動的に（テンプレートにデータを受け渡す）Modelにインスタンスが登録されます。
+    //これは@ModelAttributeアノテーションを付与せずに model.addAttribute("user", user); と記述することと同一です。
+    //テンプレート側では user を使い <input type="text" th:field="${user.name}> のように記述できます。
+    //実際に生成されるHTMLでは th:field="${user.name} の部分が id="name" name="name" のように変換されます。
+    //これによりHTMLのFormの項目が、Userエンティティの項目に紐付けられます。
+
+
     /** User登録処理 */
     @PostMapping("/register")
     public String postRegister(@Validated User user, BindingResult res, Model model) {
@@ -54,22 +61,48 @@ public class UserController {
         return "redirect:/user/list";
     }
 
+    //POST側では引数にエンティティを指定することで、HTMLのFormの項目値が、引数のuserの属性としてセットされた状態で受け取ることができます。
+
+    //@Validated アノテーションにより User エンティティの設定に基づいた入力チェックが行なわれます。入力チェックの結果は BindingResult res に格納されます。
+    //res.hasErrors() でエラーの有無を確認できます。エラーだった場合は getUser() メソッドを呼び出すことで、User更新画面を表示します。
+
+
+
     /** User更新画面を表示 */
     @GetMapping("/update/{id}/")
-    public String getUser(@PathVariable("id") Integer id, Model model) {
-        //Modelに登録
-        model.addAttribute("user", service.getUser(id));
+    public String getUser(@PathVariable("id") Integer id, Model model, User user) {
+
+
+        if(id != null) {
+            //Modelに登録
+            model.addAttribute("user", service.getUser(id));
+        }else {
+            model.addAttribute("user", user);
+        }
         //User更新画面に遷移
         return "user/update";
+
     }
 
     @PostMapping("/update/{id}/")
-    public String postUser(User user) {
+    public String postUser(@Validated User user, BindingResult res, Model model) {
+
+        if(res.hasErrors()) {
+            // エラーあり
+            return getUser(null, model, user);
+        }
         //User登録
         service.saveUser(user);
         //一覧画面にリダイレクト
         return "redirect:/user/list";
     }
+
+
+
+    //@PathVariable("id") Integer id でパスパラメータからidを取得しています。
+    //そのidを使用し、サービスの getUser(id) 関数で更新対象のUserを取得し、Modelに登録しています。
+    //User更新処理はUser登録処理と同一の内容です
+
 
     /** User削除処理 */
     @PostMapping(path="list", params="deleteRun")

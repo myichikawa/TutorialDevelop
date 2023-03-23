@@ -7,6 +7,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -45,7 +47,8 @@ class UserControllerTest {
                 .apply(springSecurity()).build();
     }
 
-    //@BeforeEach アノテーションを付けると、各テストの前に、この処理が実行されます。本プロジェクトではSpring Securityを使用しているため、各テストの前に有効化しています
+    //@BeforeEach アノテーションを付けると、各テストの前に、この処理が実行されます。
+    //本プロジェクトではSpring Securityを使用しているため、各テストの前に有効化しています
 
 
     @Test
@@ -68,4 +71,34 @@ class UserControllerTest {
             assertEquals(user.getName(), "キラメキ太郎");
     }
 
+    @Test
+    @DisplayName("一覧画面")
+    @WithMockUser
+    void testGetlist()throws Exception {
+        //HTTPリクエストに対するレスポンスの検証
+        MvcResult result = mockMvc.perform(get("/user/list"))//URLにアクセス
+                .andExpect(status().isOk())//ステータスを確認
+                .andExpect(model().attributeExists("userlist")) // Modelの内容を確認 (viewに渡しているModelにuserlistが登録されていることを確認)
+                .andExpect(model().hasNoErrors()) // Modelのエラー有無の確認
+                .andExpect(view().name("user/list")) // viewの名称確認
+                .andReturn(); // 内容の取得.内容は result 変数に格納
+
+            // userの検証
+            // Modelからuserlistを取り出す
+            List<User> userlist = (List<User>)result.getModelAndView().getModel().get("userlist");
+
+            assertEquals(userlist.size(),3);
+
+            User user1 = userlist.get(0);
+            assertEquals(user1.getId(), 1);
+            assertEquals(user1.getName(), "キラメキ太郎");
+
+            User user2 = userlist.get(1);
+            assertEquals(user2.getId(), 2);
+            assertEquals(user2.getName(), "キラメキ次郎");
+
+            User user3 = userlist.get(2);
+            assertEquals(user3.getId(), 3);
+            assertEquals(user3.getName(), "キラメキ花子");
+    }
 }
